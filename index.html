@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DreamLife Village</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="game-shell">
+      <header class="topbar">
+        <div class="brand">DreamLife Village</div>
+        <div class="stats">
+          <div class="coin-box">Coins: <span id="coins">120</span></div>
+          <div class="energy-box">Mood: <span id="mood">Happy</span></div>
+        </div>
+      </header>
+
+      <main class="main-layout">
+        <section class="left panel">
+          <h2>Avatar Creator</h2>
+
+          <div class="control-group">
+            <label>Hair</label>
+            <div class="swatches" id="hair-options"></div>
+          </div>
+
+          <div class="control-group">
+            <label>Skin</label>
+            <div class="swatches" id="skin-options"></div>
+          </div>
+
+          <div class="control-group">
+            <label>Top</label>
+            <div class="swatches" id="top-options"></div>
+          </div>
+
+          <div class="control-group">
+            <label>Bottom</label>
+            <div class="swatches" id="bottom-options"></div>
+          </div>
+
+          <div class="control-group">
+            <label>Accessory</label>
+            <div class="swatches" id="accessory-options"></div>
+          </div>
+        </section>
+
+        <section class="center panel">
+          <div class="scene">
+            <div class="room">
+              <div class="room-window"></div>
+              <div class="room-table"></div>
+              <div class="room-plant"></div>
+
+              <div class="avatar" id="avatar">
+                <div class="hair" id="hair"></div>
+                <div class="head" id="head"></div>
+                <div class="body" id="body"></div>
+                <div class="legs" id="legs"></div>
+                <div class="accessory" id="accessory"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button id="gacha-btn">Gacha Pull</button>
+            <button id="mini-game-btn">Mini Game</button>
+            <button id="dress-up-btn">Save Style</button>
+          </div>
+        </section>
+
+        <aside class="right panel">
+          <h2>Wardrobe</h2>
+          <div id="inventory" class="inventory"></div>
+
+          <div class="mini-game-panel">
+            <h3>Star Catch</h3>
+            <div id="mini-game-area" class="mini-game-area">
+              <div id="timer">Time: 20</div>
+              <div id="score">Score: 0</div>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
