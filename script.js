@@ -6,36 +6,43 @@ const avatarState = {
   accessory: "none"
 };
 
+const roomNames = {
+  home: "Home",
+  park: "Park",
+  cafe: "Cafe",
+  shop: "Style Shop"
+};
+
 const items = {
   hair: [
-    { name: "Brown Bob", value: "brown", color: "#3c2d2d" },
-    { name: "Blonde Waves", value: "blonde", color: "#e3c56b" },
-    { name: "Pink Pony", value: "pink", color: "#ff7cb8" },
-    { name: "Black Star", value: "black", color: "#1d1d1d" }
+    { name: "Brown Bob", value: "brown", color: "#2b1d29" },
+    { name: "Blonde Waves", value: "blonde", color: "#d7b95d" },
+    { name: "Pink Dream", value: "pink", color: "#ff7dbb" },
+    { name: "Black Star", value: "black", color: "#1a1a1a" }
   ],
   skin: [
-    { name: "Peach", value: "peach", color: "#f7d9bd" },
+    { name: "Peach", value: "peach", color: "#f7d8bf" },
     { name: "Honey", value: "honey", color: "#d9a06d" },
-    { name: "Chocolate", value: "choco", color: "#8f5b3d" },
-    { name: "Fair", value: "fair", color: "#f8e4d6" }
+    { name: "Chocolate", value: "choco", color: "#8d5a40" },
+    { name: "Fair", value: "fair", color: "#f6ebdf" }
   ],
   top: [
     { name: "Pink Tee", value: "pink", color: "#ffb7d8" },
-    { name: "Purple Hoodie", value: "purple", color: "#af9bf8" },
-    { name: "Mint Dress", value: "mint", color: "#9ef0bb" },
-    { name: "Yellow Sweater", value: "yellow", color: "#ffd76a" }
+    { name: "Purple Hoodie", value: "purple", color: "#ab9cff" },
+    { name: "Mint Dress", value: "mint", color: "#9ef0c1" },
+    { name: "Yellow Sweater", value: "yellow", color: "#ffe08d" }
   ],
   bottom: [
-    { name: "Blue Skirt", value: "blue", color: "#8ccfff" },
-    { name: "Jeans", value: "jean", color: "#6ab3ff" },
-    { name: "Pink Shorts", value: "shorts", color: "#ff9fcb" },
+    { name: "Blue Skirt", value: "blue", color: "#86d0ff" },
+    { name: "Jeans", value: "jean", color: "#5ca7ff" },
+    { name: "Pink Shorts", value: "shorts", color: "#ff95c8" },
     { name: "Orange Pants", value: "orange", color: "#f7b26a" }
   ],
   accessory: [
     { name: "None", value: "none", color: "#ffffff" },
     { name: "Star Clip", value: "star", color: "#ffd76a" },
-    { name: "Bow", value: "bow", color: "#ff8dc7" },
-    { name: "Heart Glasses", value: "glasses", color: "#98d8ff" }
+    { name: "Bow", value: "bow", color: "#ff9ad0" },
+    { name: "Heart Glasses", value: "glasses", color: "#8bd4ff" }
   ]
 };
 
@@ -53,15 +60,41 @@ const inventoryEl = document.getElementById("inventory");
 const miniGameArea = document.getElementById("mini-game-area");
 const timerEl = document.getElementById("timer");
 const scoreEl = document.getElementById("score");
+const avatarEl = document.getElementById("avatar");
 
 let coins = 120;
 let score = 0;
-let miniGameActive = false;
 let timer = 20;
 let timerId = null;
+let miniGameActive = false;
+let currentRoom = "home";
+let avatarX = 210;
+let avatarY = 190;
+
+function saveState() {
+  const state = { avatarState, coins, currentRoom, avatarX, avatarY };
+  localStorage.setItem("dreamlife-village-save", JSON.stringify(state));
+}
+
+function loadState() {
+  const raw = localStorage.getItem("dreamlife-village-save");
+  if (!raw) return;
+
+  try {
+    const state = JSON.parse(raw);
+    if (state.avatarState) Object.assign(avatarState, state.avatarState);
+    if (typeof state.coins === "number") coins = state.coins;
+    if (state.currentRoom) currentRoom = state.currentRoom;
+    if (typeof state.avatarX === "number") avatarX = state.avatarX;
+    if (typeof state.avatarY === "number") avatarY = state.avatarY;
+  } catch (err) {
+    console.log("Save data was invalid, starting fresh.");
+  }
+}
 
 function renderSwatches(group, selectedValue) {
   const container = document.getElementById(`${group}-options`);
+  if (!container) return;
   container.innerHTML = "";
 
   items[group].forEach((item) => {
@@ -73,49 +106,40 @@ function renderSwatches(group, selectedValue) {
       avatarState[group] = item.value;
       updateAvatar();
       renderSwatches(group, item.value);
+      saveState();
     });
     container.appendChild(btn);
   });
 }
 
 function updateAvatar() {
-  const hairEl = document.getElementById("hair");
-  const bodyEl = document.getElementById("body");
-  const legsEl = document.getElementById("legs");
+  const hairColor = items.hair.find(i => i.value === avatarState.hair)?.color || "#2b1d29";
+  const skinColor = items.skin.find(i => i.value === avatarState.skin)?.color || "#f7d8bf";
+  const topColor = items.top.find(i => i.value === avatarState.top)?.color || "#ffb7d8";
+  const bottomColor = items.bottom.find(i => i.value === avatarState.bottom)?.color || "#86d0ff";
+  const accessoryValue = avatarState.accessory;
   const accessoryEl = document.getElementById("accessory");
 
-  const hairColor = items.hair.find(i => i.value === avatarState.hair)?.color || "#3c2d2d";
-  const skinColor = items.skin.find(i => i.value === avatarState.skin)?.color || "#f7d9bd";
-  const topColor = items.top.find(i => i.value === avatarState.top)?.color || "#ffb7d8";
-  const bottomColor = items.bottom.find(i => i.value === avatarState.bottom)?.color || "#8ccfff";
-  const accessoryColor = items.accessory.find(i => i.value === avatarState.accessory)?.color || "#ffffff";
-
   document.getElementById("head").style.background = skinColor;
-  hairEl.style.background = hairColor;
-  bodyEl.style.background = topColor;
-  legsEl.style.background = bottomColor;
+  document.getElementById("hair").style.background = hairColor;
+  document.getElementById("body").style.background = topColor;
+  document.getElementById("legs").style.background = bottomColor;
 
-  if (avatarState.accessory === "none") {
-    accessoryEl.style.opacity = 0;
-    accessoryEl.style.background = "transparent";
-  } else if (avatarState.accessory === "star") {
-    accessoryEl.style.opacity = 1;
-    accessoryEl.style.background = accessoryColor;
-    accessoryEl.style.width = "80px";
-    accessoryEl.style.height = "22px";
-    accessoryEl.style.borderRadius = "999px";
-  } else if (avatarState.accessory === "bow") {
-    accessoryEl.style.opacity = 1;
-    accessoryEl.style.background = accessoryColor;
-    accessoryEl.style.width = "60px";
-    accessoryEl.style.height = "20px";
-    accessoryEl.style.borderRadius = "50%";
-  } else if (avatarState.accessory === "glasses") {
-    accessoryEl.style.opacity = 1;
-    accessoryEl.style.background = accessoryColor;
-    accessoryEl.style.width = "90px";
-    accessoryEl.style.height = "22px";
-    accessoryEl.style.borderRadius = "16px";
+  const hair = document.getElementById("hair");
+  hair.style.background = hairColor;
+  hair.style.borderRadius = "54% 46% 34% 34%";
+
+  accessoryEl.className = "accessory";
+  if (accessoryValue === "none") {
+    accessoryEl.style.opacity = "0";
+    accessoryEl.style.width = "0";
+    accessoryEl.style.height = "0";
+  } else {
+    accessoryEl.classList.add(accessoryValue);
+    accessoryEl.style.opacity = "1";
+    accessoryEl.style.left = "50%";
+    accessoryEl.style.top = "10px";
+    accessoryEl.style.transform = "translateX(-50%)";
   }
 }
 
@@ -129,31 +153,67 @@ function renderInventory() {
   });
 }
 
-function getRandomItem(type) {
-  const pool = items[type];
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
 function addCoins(amount) {
   coins += amount;
   coinsEl.textContent = coins;
+  saveState();
+}
+
+function setRoom(roomKey) {
+  currentRoom = roomKey;
+  document.querySelectorAll(".room").forEach((room) => room.classList.remove("active"));
+  document.getElementById(`room-${roomKey}`).classList.add("active");
+
+  document.querySelectorAll(".room-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.room === roomKey);
+  });
+
+  const roomLabel = roomNames[roomKey] || "Home";
+  moodEl.textContent = roomLabel === "Park" ? "Playful" : roomLabel === "Cafe" ? "Cozy" : roomLabel === "Style Shop" ? "Stylish" : "Happy";
+  saveState();
+}
+
+function updateAvatarPosition() {
+  const maxX = 480;
+  const maxY = 380;
+  const clampedX = Math.min(maxX, Math.max(40, avatarX));
+  const clampedY = Math.min(maxY, Math.max(80, avatarY));
+
+  avatarEl.style.left = `${clampedX}px`;
+  avatarEl.style.top = `${clampedY}px`;
+}
+
+function moveAvatar(dx, dy) {
+  avatarX += dx;
+  avatarY += dy;
+  updateAvatarPosition();
+  saveState();
+}
+
+function handleKeydown(event) {
+  const key = event.key.toLowerCase();
+  if (key === "arrowleft" || key === "a") moveAvatar(-20, 0);
+  if (key === "arrowright" || key === "d") moveAvatar(20, 0);
+  if (key === "arrowup" || key === "w") moveAvatar(0, -20);
+  if (key === "arrowdown" || key === "s") moveAvatar(0, 20);
 }
 
 document.getElementById("gacha-btn").addEventListener("click", () => {
   const typeRoll = ["hair", "top", "bottom", "accessory"][Math.floor(Math.random() * 4)];
-  const prize = getRandomItem(typeRoll);
+  const prize = items[typeRoll][Math.floor(Math.random() * items[typeRoll].length)];
   inventory.push(prize.name);
   addCoins(25);
 
   const moodText = prize.name.includes("Pink") || prize.name.includes("Star") ? "Excited" : "Joyful";
   moodEl.textContent = moodText;
-
   renderInventory();
+  saveState();
 });
 
 document.getElementById("dress-up-btn").addEventListener("click", () => {
   moodEl.textContent = "Stylish";
   addCoins(10);
+  saveState();
 });
 
 function startMiniGame() {
@@ -165,7 +225,7 @@ function startMiniGame() {
   timerEl.textContent = `Time: ${timer}`;
   scoreEl.textContent = `Score: ${score}`;
 
-  miniGameArea.querySelectorAll(".star").forEach(el => el.remove());
+  miniGameArea.querySelectorAll(".star").forEach(star => star.remove());
 
   spawnStar();
 
@@ -181,9 +241,7 @@ function startMiniGame() {
       return;
     }
 
-    if (Math.random() < 0.5) {
-      spawnStar();
-    }
+    if (Math.random() < 0.45) spawnStar();
   }, 1000);
 }
 
@@ -209,11 +267,16 @@ function spawnStar() {
 }
 
 document.getElementById("mini-game-btn").addEventListener("click", startMiniGame);
-
-Object.keys(items).forEach((key) => {
-  renderSwatches(key, avatarState[key]);
+document.querySelectorAll(".room-btn").forEach((button) => {
+  button.addEventListener("click", () => setRoom(button.dataset.room));
 });
 
+document.addEventListener("keydown", handleKeydown);
+
+Object.keys(items).forEach((key) => renderSwatches(key, avatarState[key]));
+loadState();
 updateAvatar();
+updateAvatarPosition();
 renderInventory();
+setRoom(currentRoom);
 coinsEl.textContent = coins;
