@@ -21,6 +21,11 @@
           <h2>Avatar Creator</h2>
 
           <div class="control-group">
+            <label>Age Range</label>
+            <div class="swatches" id="age-options"></div>
+          </div>
+
+          <div class="control-group">
             <label>Hair</label>
             <div class="swatches" id="hair-options"></div>
           </div>
@@ -100,10 +105,15 @@
         </section>
 
         <aside class="right panel">
-          <h2>Wardrobe</h2>
-          <div id="inventory" class="inventory"></div>
+          <h2>NPC Chat</h2>
+          <div id="npc-list" class="npc-list"></div>
+          <div id="chat-log" class="chat-log"></div>
+          <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Say something..." maxlength="120" />
+            <button id="chat-send">Send</button>
+          </div>
 
-          <div class="mini-game-panel">
+          <div class="mini-game-panel" style="margin-top: 16px;">
             <h3>Star Catch</h3>
             <div id="mini-game-area" class="mini-game-area">
               <div id="timer">Time: 20</div>
